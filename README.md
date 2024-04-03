@@ -43,7 +43,7 @@ ER-NeRF 项目主要使用了以下已编写好的脚本：
 
 ### FastAPI 挂载服务
 
-可以使用 FastAPI 框架将 ER-NeRF 作为一个 Web 服务挂载：
+可以使用 FastAPI 框架将 ER-NeRF 作为一个 接口 服务挂载：
 
 ```python
 from fastapi import FastAPI
