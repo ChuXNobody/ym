@@ -1,25 +1,72 @@
-## 项目名称：ym_jobwoek_example
+## 项目介绍
 
-该项目包含以下子目录：
+该项目是在工作期间开发和部署的，使用了多种技术和算法，包括改进了 ER-NeRF 的生成，预加载模型，以及利用 ffmpeg 作为单独进程，多线程处理等。下面将对项目进行详细解析。
 
-- **3D-Human-Face-Reconstruction-with-3DMM-face-model-from-RGB-image-main**: 包含一个名为 "3D-Human-Face-Reconstruction-with-3DMM-face-model-from-RGB-image-main" 的子项目。
+### 项目结构
 
-- **aduio_data**: 存储音频数据。
+```
+\ym_jobwoek_example
+    --3D-Human-Face-Reconstruction-with-3DMM-face-model-from-RGB-image-main
+    --aduio_data
+    --cub-2.1.0
+    --ER-NeRF
+    --ER-NERF所需模型
+    --face-alignment
+    --metahuman-stream
+    --OpenFace_2.2.0_win_x64
+    --wav2lip
+    --wav2lip288*288
+    --ym_python_exmple
+```
 
-- **cub-2.1.0**: 包含一个名为 "cub-2.1.0" 的子项目或依赖。
+### 技术栈
 
-- **ER-NeRF**: 包含一个名为 "ER-NeRF" 的子项目。
+- Python
+- FastAPI
+- WebSocket
+- FFmpeg
+- HTTP
+- TCP
 
-- **ER-NERF所需模型**: 存储 ER-NERF 所需的模型文件。
+### 使用算法
 
-- **face-alignment**: 包含一个名为 "face-alignment" 的子项目，可能与人脸对齐相关。
+- 3DMM（3维人脸重建算法集成）
+- NeRF（用于训练数据集的深度学习模型）
+- OpenFace（用于收集图像进行推理生成 CVS 坐标数据集）
+- DeepSpeech（对音频进行特征提取和推理）
 
-- **metahuman-stream**: 包含一个名为 "metahuman-stream" 的子项目或相关内容。
+### 主要项目：ER-NeRF
 
-- **OpenFace_2.2.0_win_x64**: 包含一个名为 "OpenFace_2.2.0_win_x64" 的子项目或工具。
+ER-NeRF 项目主要使用了以下已编写好的脚本：
 
-- **wav2lip**: 包含一个名为 "wav2lip" 的子项目或工具。
+- **tts.py**: 用于启用数据进行推理。命令为 `python tts.py data/01/ --workspace trial_vrh_torso/ -O`，其中 `data/01/` 是要使用的数据，`trial_vrh_torso` 是包含身体模型的工作空间。
 
-- **wav2lip288*288**: 包含一个名为 "wav2lip288*288" 的子项目或工具。
+### FastAPI 挂载服务
 
-- **ym_python_exmple**: 包含一个名为 "ym_python_exmple" 的子项目。
+可以使用 FastAPI 框架将 ER-NeRF 作为一个 Web 服务挂载：
+
+```python
+from fastapi import FastAPI
+from uvicorn import run
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to ER-NeRF API!"}
+
+@app.post("/run_er_nerf")
+async def run_er_nerf(data_path: str, workspace: str):
+    return {"message": "ER-NeRF is running with data from " + data_path}
+
+if __name__ == "__main__":
+    run(app, host="192.168.31.199", port=8000)
+```
+
+可以使用 `uvicorn` 启动 FastAPI 服务器：
+
+```
+uvicorn app:app --host 192.168.31.199 --port 8000
+```
+
+这样就可以通过访问 `http://192.168.31.199:8000` 来访问 ER-NeRF 的 API 了。
