@@ -84,13 +84,62 @@ pip install -r requirements.txt
 
 ## 6. 主要项目 - ER-NeRF
 
-ER-NeRF 项目是本项目的核心部分，主要实现了对数据的推理和处理。具体操作方式如下：
+# ER-NeRF项目文档
 
-- 使用 `tts.py` 进行操作。
-- 启用命令为 `python tts.py data/01/ --workspace trial_vrh_torso/ -O`。
-- 使用 data 目录中的数据进行数据推理。
-- `trial_vrh_torso` 是包含身体的模型。
-- 启用之后可部署在本地，也可以使用命令启用 FastAPI 服务，端口为 8000。
+## 概述
+
+ER-NeRF项目是本项目的核心部分，主要实现了对数据的推理和处理。该项目通过`tts.py`进行操作，具体操作方式如下：
+
+```bash
+python tts.py data/01/ --workspace trial_vrh_torso/ -O
+```
+
+- 使用`data`目录中的数据进行数据推理。
+- `trial_vrh_torso`是包含身体的模型。
+
+## 部署方式
+
+启用之后可部署在本地，也可以使用命令启用FastAPI服务，端口为8000。
+
+```python
+import uvicorn
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="192.168.31.199", port=8000)
+```
+
+## 文本转语音功能
+
+项目提供了文本转语音的功能，可以通过HTTP请求实现。以下是一个示例Python脚本`request.py`：
+
+```python
+import requests
+
+def convert_text_to_audio(text, voice="zh-CN-YunyangNeural", server_url="http://192.168.31.199:8000"):
+    endpoint = server_url + "/convert/"
+    data = {"text": text, "voice": voice}
+    try:
+        response = requests.post(endpoint, json=data)
+        if response.status_code == 200:
+            result = response.json()
+            print("Audio conversion successful!")
+            print("Output audio file:", result["output_file"])
+            print("Output feature file:", result["output_feature_file"])
+        else:
+            print("Error:", response.status_code, response.text)
+    except Exception as e:
+        print("Error occurred:", e)
+
+if __name__ == "__main__":
+    text_input = input("Enter the text you want to convert to audio: ")
+    convert_text_to_audio(text_input)
+```
+
+以上脚本通过HTTP请求向指定的服务器发送文本，并接收处理后的语音文件。可以根据需要修改服务器URL和语音参数。
+
+## 注意事项
+
+在使用本项目时，请确保正确配置相关参数，并根据需要修改代码以适应特定场景。
 
 ```python
 import uvicorn
